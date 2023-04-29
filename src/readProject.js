@@ -11,17 +11,14 @@ const readProject = () => {
 
     mongoose.connect(mongoDBUrl, { useNewUrlParser: true });
 
-    const { fileCount, data:readingData } = readDirectory(path.join(__dirname, projectDir));
+    const dirIsRead = readDirectory(path.join(__dirname, projectDir));
 
-    if (fileCount > 0) {
-        console.log('eren -->', readingData);
+    if (dirIsRead) {
+        //ana eğitim texti ile gpt'i eğit. (bu eğitim developair'in görevini gpt ye anlatır ve gpt'nin kendisini developair olarak benimsemesini sağlar)
+        //prompt_completion_pairs.json ile gpt'yi eğit. (bu eğitim projenin okunan dosyaları ile developair'i eğitir.)
+    } else {
+        throw new Error(`😔 project_name okunurken bir hata oluştu.`);
     }
 }
 
 module.exports = readProject;
-
-git remote add origin https://github.com/ernemmez/developair.git
-git pull origin main
-git add .
-git commit -m "Initial commit"
-git push -u origin main
