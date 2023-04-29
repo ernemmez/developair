@@ -9,8 +9,12 @@ const main = () => {
 
     if (cli.flags.init) createConfigFile();
 
-    if (cli.input[0] === 'read-project') {
-        readProject()
+    switch (cli.input[0]) {
+        case 'read-project':
+            readProject()
+            break;
+        default:
+            break;
     }
 }
 
