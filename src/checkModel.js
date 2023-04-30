@@ -1,6 +1,8 @@
 const { openai } = require("../lib/constants")
+const fs = require('fs');
 
 const createModelNameFile = (modelName) => {
+    console.log('eren -->', modelName);
     if (fs.existsSync(modelName)) {
         const content = fs.readFileSync('model_name.txt', 'utf8');
         
@@ -22,8 +24,8 @@ const checkModel = () => {
     const models = openai.listFineTunes();
 
     models.then((data) => {
-        if (data.data.data.status === 'succeeded') {
-            const model = data.data.data.fine_tuned_model;
+        if (data.data.data[0].status === 'succeeded') {
+            const model = data.data.data[0].fine_tuned_model;
 
             console.log('developair modeli hazır 🥳');
             createModelNameFile(model)

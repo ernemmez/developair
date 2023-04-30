@@ -1,15 +1,18 @@
-const readline = require('readline');
+const { openai } = require("../lib/constants");
+const fs = require('fs');
+
 
 const askDevelopair = () => {
-    const readline = require('readline').createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
+   const model = fs.readFileSync('model_name.txt', 'utf8');
 
-    readline.question('you: ', (question) => {
-      console.log('developair: eren emmez');
-      readline.close();
-    });
+   const response = openai.createCompletion({
+    model,
+    prompt: 'main.js dosyasının içeriğini bana anlatır mısın?'
+   })
+
+   response.then((data) => {
+    console.log(data.data.choices[0].text);
+   }).catch(err => console.log(err));
 }
   
 module.exports = askDevelopair;
