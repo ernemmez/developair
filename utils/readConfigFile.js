@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const configFile = path.join(process.cwd(), 'developair.config.js');
-
 module.exports = () => {
+  const configFile = path.join(process.cwd(), 'developair.config.js');
+  
   try {
     const data = fs.readFileSync(configFile, 'utf-8');
     return eval(data.toString());

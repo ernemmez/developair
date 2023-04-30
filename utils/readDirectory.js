@@ -1,50 +1,63 @@
 const fs = require('fs');
 const path = require('path');
 const { Parser } = require('json2csv');
-const readCsvFile = require('./readCsvFile');
+const createPromptCompletionPairsFile = require('./readCsvFile');
 
 const readDirectory = (dir) => {
-  try {
-    const files = fs.readdirSync(dir);
-    const readingData = []
-
-    files.forEach((fileName) => {
-      const filePath = path.join(dir, fileName);
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
-
-      if (fs.statSync(filePath).isDirectory()) {
-        readDirectory(filePath);
+  const promise = new Promise((resolve, reject) => {
+    fs.readdir(dir, (err, files) => {
+      if (err) {
+        reject(`Hata: ${dir} dizini okunurken bir hata oluştu: ${err}`);
       }
 
-      readingData.push({ fileName, filePath, fileContent });
-    });
+      const readingData = [];
 
-    try {
+      files.forEach((fileName) => {
+        const filePath = path.join(dir, fileName);
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
+
+        if (fs.statSync(filePath).isDirectory()) {
+          readDirectory(filePath)
+            .then((subDirData) => {
+              readingData.push(...subDirData);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        } else {
+          readingData.push({ fileName, filePath, fileContent });
+        }
+      });
+
       if (readingData.length > 0) {
-        //csv için veri oluştur
+        // csv için veri oluştur
         const fields = ['fileName', 'filePath', 'fileContent'];
         const opts = { fields };
         const parser = new Parser(opts);
         const csv = parser.parse(readingData);
-    
+
         // CSV verisini dosyaya yaz
-        fs.writeFileSync('project_name.csv', csv);
-        console.log('CSV dosyası başarıyla oluşturuldu.');
-
-        readCsvFile('project_name'); // gpt 'yi eğitecek prompt ve completion 'lardan oluşan bir json dosyası oluşturur.
+        fs.writeFile('project_name.csv', csv, (err) => {
+          if (err) {
+            reject('CSV dosyası oluşturulurken bir hata oluştu: ' + err.message);
+          } else {
+            console.log('CSV dosyası başarıyla oluşturuldu.');
+            createPromptCompletionPairsFile('project_name')
+              .then(() => {
+                resolve('GPT için prompt ve completion verileri başarıyla oluşturuldu.');
+              })
+              .catch((err) => {
+                reject('GPT için prompt ve completion verileri oluşturulurken bir hata oluştu: ' + err.message);
+              });
+          }
+        });
+      } else {
+        resolve('Dizinde okunacak dosya yok.');
       }
-    } catch (err) {
-      console.log('CSV dosyası oluşturulurken bir hata oluştu: ' + err.message);
+    });
+  });
 
-      return false;
-    }
-
-    return true; // başarıyla okundu
-  } catch (err) {
-    console.error(`Hata: ${dir} dizini okunurken bir hata oluştu: ${err}`);
-
-    return false; // directory okunurken hata oluştu
-  }
+  return promise;
 };
 
 module.exports = readDirectory;

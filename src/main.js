@@ -1,9 +1,13 @@
 const cli = require('../utils/cli');
 const createConfigFile = require('../utils/createConfigFile');
-const readProject = require('./readProject');
-const input = cli.input;
+const readAndPrepareData = require('./readProjectAndPrepareData');
+const createFineTune = require('../utils/createFineTune');
+const checkModel = require('./checkModel');
+const askDevelopair = require('./askDevelopair');
 
-const main = () => {
+const main = async () => {
+    const input = cli.input;
+
     input.includes(`help`) && cli.showHelp(0);
 
 
@@ -11,8 +15,17 @@ const main = () => {
 
     switch (cli.input[0]) {
         case 'read-project':
-            readProject()
+            readAndPrepareData();
             break;
+        case 'fine-tune':
+            createFineTune();
+            break;    
+        case 'check-model-status':
+            checkModel();
+            break;
+        case 'ask':
+            askDevelopair();
+            break;          
         default:
             break;
     }
