@@ -1,7 +1,7 @@
 {
 	"name": "developair",
 	"description": "A developer descended from Openai. Integrate it into your project and tell it what to do!",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"license": "UNLICENSED",
 	"bin": {
 		"developair": "index.js"
